@@ -1,7 +1,12 @@
-# Internal Preliminary Report: Comparative Analysis of MRMS Precipitation Data
+# Comparative Analysis of MRMS Precipitation Data
 
-**Date:** June 18, 2024  
-**Subject:** Proof-of-Concept Evaluation of NetCDF (IEM) vs. GRIB2 (NOAA) MRMS Precipitation Data
+| | |
+| :--- | :--- |
+| **To:** | CTR Project Team, TxDOT |
+| **From:** | Adam Kosicki, Engineering Scientist Associate |
+| | Center for Transportation Research, The University of Texas at Austin |
+| **Date:** | June 18, 2024 |
+| **Subject:** | Proof-of-Concept Evaluation of NetCDF (IEM) vs. GRIB2 (NOAA) MRMS Precipitation Data |
 
 ---
 
@@ -342,3 +347,13 @@ This comparison shows the difference in metadata between the two sources for a s
 | 9 | AWS Open-Data registry entry for the noaa-mrms-pds S3 bucket (documents 2-minute update cycle, licensing, and bucket path). | https://registry.opendata.aws/noaa-mrms-pds/ |
 | 10 | NSSL MRMS project overview (background on system provenance and product cadence). | https://www.nssl.noaa.gov/projects/mrms/ |
 | 11 | MRMS v12.2 Supplemental document ― confirms that all GRIB2 products are disseminated via NCEP web services/LDM and lists PrecipRate among them. | https://www.weather.gov/idp/MRMS_v12.2_Supplemental |
+
+## Contact Information
+
+For questions or clarifications regarding the data acquisition, strategies, and analysis:
+
+**Adam Kosicki**  
+Engineering Scientist Associate  
+Center for Transportation Research  
+The University of Texas at Austin  
+Email: adam.kosicki@austin.utexas.edu
