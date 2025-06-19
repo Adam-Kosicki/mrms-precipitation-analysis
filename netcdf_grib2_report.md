@@ -219,6 +219,7 @@ The most critical difference for TxDOT's crash analysis is the precision of prec
 
 *   **GRIB2 Precision:** The `PrecipRate` field is stored at high resolution (floating-point mm/hr), preserving subtle variations in intensity [5].
 *   **NetCDF Quantization:** The IEM A2M product has a minimum non-zero threshold of **0.02 mm** per 2-minute interval [1]. Any precipitation rate that calculates to an accumulation below this value is rounded down to zero.
+** Need to double check this **
 
 For example, a light drizzle of 0.5 mm/hr equates to ~0.017 mm of rain in 2 minutes. The direct GRIB2 workflow correctly identifies this as a non-zero precipitation event. However, since 0.017 mm is below IEM's 0.02 mm threshold, their NetCDF product reports `0.0 mm`. This quantization effect directly explains the **4.5% discrepancy rate** we found, where the GRIB2 data showed trace precipitation that was absent in the NetCDF data.
 
