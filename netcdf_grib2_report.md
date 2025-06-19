@@ -154,7 +154,7 @@ The existing **MRMS-CRIS Records Mapping System**, as detailed in its technical 
 *   **Current Method (NetCDF):** Checks the 2-minute precipitation value for the interval containing the crash time.
 *   **Impact of GRIB2:**
     *   This variable will be directly affected by the quantization issue. If an incident occurred during a 2-minute interval with light drizzle, NetCDF might report `0.0 mm` (Status: "No"), while GRIB2 would report a non-zero value (Status: "Yes").
-    *   The 4.5% discrepancy rate found in your analysis is a reasonable estimate for how often this variable's value could flip. **This is a critical change**, as it directly impacts any analysis of crash risk *while it is actively precipitating*.
+    *   The 4.5% discrepancy rate found in this analysis is a reasonable estimate for how often this variable's value could flip. **This is a critical change**, as it directly impacts any analysis of crash risk *while it is actively precipitating*.
 
 ##### 3. Minutes Since Rain Stopped
 
