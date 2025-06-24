@@ -12,25 +12,22 @@
 
 ### 1. Executive Summary
 
-This report details a comparative analysis of two different data sources for MRMS (Multi-Radar Multi-Sensor) precipitation data: NetCDF files from the Iowa Environmental Mesonet (IEM)—the source used by CTR's existing **MRMS-CRIS Records Mapping System**—and GRIB2 files directly from the NOAA S3 data repository.
+This report details a preliminary comparative analysis of two different data sources for MRMS (Multi-Radar Multi-Sensor) precipitation data: NetCDF files from the Iowa Environmental Mesonet (IEM)—the source currently used by CTR's **MRMS-CRIS Records Mapping System**—and GRIB2 files directly from the NOAA S3 data repository.
 
-The analysis proves that while the sources are correlated, they are not interchangeable. The IEM NetCDF pipeline introduces a **lossy quantization step** that degrades data precision and erases trace precipitation events, a critical flaw for crash analysis.
+The objective of this proof-of-concept, conducted via the `comparison.py` and `data_analyis.py` scripts, is to determine if significant, measurable differences exist between the two data sources using a statistically relevant sample size. This provides a recommendation on whether a full-scale analysis is warranted before proposing a data source modification to the existing system.
 
-*   The direct **GRIB2** data from NOAA provides precipitation rates with **full floating-point precision**, capturing the complete weather picture.
-*   The IEM **NetCDF** service generates data from 8-bit PNG images, limiting values to 256 discrete bins and creating an artificial data floor of 0.02 mm.
+The analysis concludes that both data sources are highly reliable and strongly correlated. However, a key difference in data processing was identified:
 
-**Definitive Findings:**
-1.  **The GRIB2 data source is scientifically superior.** It provides full-precision data directly from the authoritative source (NOAA).
-2.  **The NetCDF data source is fundamentally flawed for this use case.** The quantization process masks real, trace amounts of precipitation, with our analysis showing GRIB2 detecting rainfall in 4.5% of cases where NetCDF reported zero.
-3.  **The GRIB2 processing methodology aligns with NOAA's own documented best practices**, which recommend bilinear interpolation for continuous fields like precipitation over the less accurate nearest-neighbor method.
+*   The direct **GRIB2** data provides precipitation rates with **full floating-point precision**.
+*   The IEM **NetCDF** service, used by the current enterprise system, provides pre-calculated 2-minute accumulations that are **quantized** (rounded into a smaller set of discrete values), which can mask trace amounts of precipitation.
 
 **Preliminary Findings:**
 1.  For **non-zero rainfall events**, the values from both sources are very similar. The GRIB2 data tends to report slightly higher values, reflecting its greater precision.
 2.  For **zero rainfall events**, the sources show a high level of agreement, but a small percentage of cases (4.5%) exist where GRIB2 detects trace precipitation that is absent in the NetCDF data.
 3.  This analysis confirms that using direct GRIB2 data is a more precise and sensitive method for precipitation detection.
 
-**Recommendation:**
-Based on this evidence, we strongly recommend the **MRMS-CRIS Records Mapping System** be updated to use the direct NOAA GRIB2 data stream. The GRIB2 workflow is the only one that provides the precision, accuracy, and scientific defensibility required for analyzing the impact of weather on crash incidents. A full-scale re-analysis is not required; the evidence of data degradation in the NetCDF pipeline is sufficient to warrant the transition.
+**Recommendation for Next Steps:**
+Based on this preliminary analysis, we recommend presenting these findings to the **TxDOT team** to decide if a full-scale analysis on the entire dataset is necessary before proposing a data source modification for the enterprise-wide **MRMS-CRIS Records Mapping System**. The evidence suggests that for applications requiring maximum precision, the GRIB2 workflow is superior.
 
 ---
 
@@ -177,30 +174,28 @@ The existing **MRMS-CRIS Records Mapping System**, as detailed in its technical 
 
 ### 5. Conclusions and Recommendations
 
-The analysis proves that while the two data sources are correlated, the IEM NetCDF service is less suitable for high-precision crash analysis due to its lossy data processing chain.
+The two data sources, while highly correlated, are not identical. The primary difference lies in the level of precision.
 
 **IEM NetCDF Service (`mrms_a2m`):**
 *   **Pros:** Highly convenient, providing data in a ready-to-use 2-minute accumulation format.
 *   **Cons:** Lower precision due to data quantization. This can lead to trace amounts of precipitation being reported as zero.
 
 **Direct GRIB2 (NOAA `PrecipRate`):**
-*   **Pros:** The **highest-fidelity path.** It provides full floating-point precision directly from the authoritative source. The processing workflow is transparent, under our control, and aligns with NOAA's documented best practices for data handling. The extra processing step is to convert the precipitation rate (mm/hr) into an accumulation (mm).
-*   **Cons:** Requires a straightforward, one-time processing step to convert rate to accumulation.
+*   **Pros:** The "source of truth." Provides data at full floating-point precision, making it more sensitive and accurate for very light precipitation.
+*   **Cons:** Requires an extra processing step to convert the precipitation rate (mm/hr) into an accumulation (mm).
 
-**Final Recommendation:**
-The **GRIB2-based pipeline is the only professionally responsible and scientifically valid choice** for the MRMS-CRIS Records Mapping System. The evidence of data degradation in the IEM NetCDF pipeline is definitive and presents a significant risk to the integrity of any safety analysis.
-
-We recommend the project **immediately adopt the GRIB2 workflow as the data standard** for all future processing and handoffs to TxDOT. A full-scale comparative analysis is unnecessary, as the fundamental flaw in the NetCDF pipeline's precision has been proven.
+**Proposed Next Steps:**
+1.  **Internal Review:** Discuss these preliminary findings with the project team to confirm the significance of the observed data precision differences.
+2.  **Decision on Full-Scale Analysis:** Determine if the value of a full-scale analysis on the entire 17.5 million record dataset is justified to solidify these findings before making a final recommendation to TxDOT.
+3.  **Finalize Data Standard:** Based on the outcome of the above, formally adopt either the GRIB2 or NetCDF workflow as the standard for different project categories.
 
 ---
 
-### 6. Verification of Data Source Integrity and Methodology
+### 6. Detailed Data Source Comparison
 
-The quantitative analysis in this report revealed key differences between the IEM NetCDF and NOAA GRIB2 data sources. This section provides a rigorous, evidence-based verification of those differences by examining the provenance, format, and precision of each data stream, and provides authoritative guidance on the correct processing methodology.
+The quantitative analysis in this report, based on the outputs of the `comparison.py` and `data_analyis.py` scripts, revealed key differences between the IEM NetCDF and NOAA GRIB2 data sources. This section provides a detailed explanation of those differences by examining the provenance, format, and precision of each data stream, with a focus on the impact for identifying light precipitation events in crash analyses. The claims made here are supported by the references in Appendix A.
 
-#### 6.1 Verification: IEM 'mrms_a2m' is Derived from NOAA 'PrecipRate'
-
-**Claim:** The IEM `mrms_a2m` NetCDF product is not an independent weather model; it is a repackaged version of the `PrecipRate` data that NOAA distributes in GRIB2 format.
+#### 6.1 Lineage of IEM's 2-Minute Accumulation (A2M) Product
 
 The IEM `mrms_a2m` dataset is derived directly from NOAA's MRMS precipitation rate outputs. According to IEM documentation, `mrms_a2m` is the "NCEP MRMS 2 minute interval precipitation accumulation" in millimeters [1, 2]. IEM ingests the real-time MRMS precipitation rate frames and repackages them as 2-minute rainfall totals. Their archive notes confirm the data is from the NCEP feed without modification [4]. In short, the IEM A2M NetCDF is not an independent estimate; it is derived from the same source data that NOAA distributes in GRIB2 format.
 
@@ -216,49 +211,21 @@ The core reason for the value discrepancies observed in our analysis is IEM's da
 
 Both NOAA and IEM utilize systematic naming conventions.
 *   **NOAA GRIB2:** Files follow the pattern `MRMS_PrecipRate_00.00_YYYYMMDD-HHMMSS.grib2.gz`, organized by product and date [6, 8].
-*   **IEM NetCDF/PNG:** The underlying archive is stored as PNGs with names like `a2m_YYYYMMDDHHMM.png` [3]. The NetCDF files are generated on-demand via a web service and do not have persistent filenames. 
+*   **IEM NetCDF/PNG:** The underlying archive is stored as PNGs with names like `a2m_YYYYMMDDHHMM.png` [3]. The NetCDF files are generated on-demand via a web service and do not have persistent filenames.
 
-The IEM `mrms_a2m` dataset is derived directly from NOAA's MRMS precipitation rate outputs. According to IEM documentation, `mrms_a2m` is the "NCEP MRMS 2 minute interval precipitation accumulation" in millimeters [1, 2]. IEM ingests the real-time MRMS precipitation rate frames and repackages them as 2-minute rainfall totals. Their archive notes confirm the data is from the NCEP feed without modification [4]. In short, the IEM A2M NetCDF is not an independent estimate; it is derived from the same source data that NOAA distributes in GRIB2 format.
-**Verdict: TRUE**
+#### 6.5 Precision and "Trace" Precipitation Considerations
 
+The most critical difference for TxDOT's crash analysis is the precision of precipitation values, especially for very light rainfall. This was the primary finding of the "Zero-Value Discrepancy Analysis" in Section 3.2.
 
 *   **GRIB2 Precision:** The `PrecipRate` field is stored at high resolution (floating-point mm/hr), preserving subtle variations in intensity [5].
 *   **NetCDF Quantization:** The IEM A2M product has a minimum non-zero threshold of **0.02 mm** per 2-minute interval [1]. Any precipitation rate that calculates to an accumulation below this value is rounded down to zero.
 ** Need to double check this **
-**Evidence:**
-*   IEM’s documentation describes `mrms_a2m` as the “NCEP MRMS 2 minute interval precipitation accumulation” [1].
-*   NOAA's operational product list shows that `PrecipRate` is the GRIB2 field for the 2-minute radar-derived surface precipitation rate (in mm/hr) [5].
-*   NOAA does not distribute a native 2-minute *accumulation* product; the shortest is 15 minutes [5, 7].
-*   **Conclusion:** To create a 2-minute accumulation, IEM must ingest the 2-minute `PrecipRate` GRIB2 data and convert the rate into an amount, confirming the direct lineage.
 
 For example, a light drizzle of 0.5 mm/hr equates to ~0.017 mm of rain in 2 minutes. The direct GRIB2 workflow correctly identifies this as a non-zero precipitation event. However, since 0.017 mm is below IEM's 0.02 mm threshold, their NetCDF product reports `0.0 mm`. This quantization effect directly explains the **4.5% discrepancy rate** we found, where the GRIB2 data showed trace precipitation that was absent in the NetCDF data.
 
-#### 6.2 Verification: The IEM NetCDF Pipeline is Lossy Due to Quantization
-**Claim:** The NetCDF files from IEM lose critical data precision because the workflow involves converting the original GRIB2 data to a low-fidelity, 8-bit PNG image.
-
-**Verdict: TRUE**
-
-**Evidence:**
-*   IEM's documentation explicitly states their storage and retrieval process:
-    > “The IEM produces … RASTERs are typically provided … as 8 bit PNG images. This means there are 256 slots available for a binned value to be placed.” [1]
-*   The lookup table for this PNG format shows that precipitation values are binned into discrete steps, with the smallest non-zero value being **0.02 mm** [1].
-*   **Conclusion:** Any precipitation event that results in less than 0.02 mm of accumulation over a 2-minute period is rounded down to zero. This permanent loss of data occurs before the NetCDF file is ever generated and delivered. This finding directly explains the 4.5% discrepancy rate observed in our analysis, where GRIB2 detected trace precipitation that IEM's NetCDF service missed.
-
-#### 6.3 Authoritative Guidance on Interpolation Methodology
-
-The methodology used to estimate a value at a specific crash coordinate is as important as the source data's precision. The approach taken for the GRIB2 pipeline (bilinear interpolation) is the NOAA-sanctioned standard for this type of data.
-
-For a statewide safety analysis, this distinction is crucial. Using the quantized IEM data may miss trace precipitation events that could still influence road friction and driver behavior, incorrectly classifying a "wet pavement" crash as occurring in "dry" conditions. The GRIB2 source is demonstrably superior for capturing these marginal weather scenarios. 
+For a statewide safety analysis, this distinction is crucial. Using the quantized IEM data may miss trace precipitation events that could still influence road friction and driver behavior, incorrectly classifying a "wet pavement" crash as occurring in "dry" conditions. The GRIB2 source is demonstrably superior for capturing these marginal weather scenarios.
 
 #### 6.6 GRIB2 Metadata Identifiers
-
-**NOAA’s official guidance recommends bilinear interpolation for continuous fields like precipitation.**
-
-| NOAA Guidance on Interpolation | Direct Quote from NOAA Documentation |
-| :--- | :--- |
-| **Default choice is bilinear** | “If the -new_grid_interpolation option is not used, the interpolation **defaults to bilinear**.” |
-| **Bilinear is for point-value extraction** | “You can use -new_grid to get point values using **bilinear interpolation rather than the simple nearest-neighbor** interpolation that the -lon uses.” |
-| **Nearest-neighbor is for categorical data** | “Some fields have integer values … you have to change the interpolation method to **nearest neighbor** …” |
 
 The analysis scripts (`comparison.py` and `data_analyis.py`) correctly identify the MRMS precipitation rate field in GRIB2 metadata using its unique identifiers:
 *   **Discipline:** 209 (NSSL)
@@ -266,9 +233,6 @@ The analysis scripts (`comparison.py` and `data_analyis.py`) correctly identify 
 *   **Parameter:** 1 (Precipitation Rate)
 
 These identifiers, documented by NOAA, confirm that the field being processed is the authoritative source for the IEM `mrms_a2m` product [5, 11].
-
-**Interpretation:**
-This confirms that using a 4-point bilinear interpolation for the GRIB2 data is the scientifically correct approach, as it produces a smoother, more representative value at the crash location. The simpler nearest-neighbor method used for the comparison in this report is only recommended for non-continuous data (e.g., soil type) and is less accurate for precipitation. The GRIB2 pipeline's adherence to the proper methodology further solidifies its superiority.
 
 ---
 
