@@ -5,7 +5,7 @@
 | **To:** | CTR Project Team, TxDOT |
 | **From:** | Adam Kosicki, Engineering Scientist Associate |
 | | Center for Transportation Research, The University of Texas at Austin |
-| **Date:** | June 18, 2024 |
+| **Date:** | June 18, 2025 |
 | **Subject:** | Proof-of-Concept Evaluation of NetCDF (IEM) vs. GRIB2 (NOAA) MRMS Precipitation Data |
 
 ---
