@@ -12,14 +12,15 @@
 
 ### Executive Summary
 
-*   **Background:** An initial CTR analysis, detailed in the [Comparative Analysis of MRMS Precipitation Data](https://github.com/Adam-Kosicki/mrms-precipitation-analysis/blob/main/netcdf_grib2_report.md) report, highlighted an opportunity to improve data precision. Following a review of these findings with TxDOT, it was determined that a transition to a GRIB2-based pipeline was warranted, shifting the focus away from a more extensive comparative analysis and leading to this recommendation.
+*   **Background:** An initial CTR analysis, detailed in the [Comparative Analysis of MRMS Precipitation Data](https://github.com/Adam-Kosicki/mrms-precipitation-analysis/blob/main/netcdf_grib2_report.md) report, has uncovered a key opportunity to improve data precision. Previously, a GRIB2-based workflow was not considered viable as it was understood that NOAA did not offer a direct 2-minute precipitation accumulation product, which the current system requires. However, our recent findings confirm that NOAA's `PrecipRate` data (in mm/hr) can be reliably converted into the necessary 2-minute accumulation. This is a crucial development because the current NetCDF provider's process involves a data conversion step that quantizes the data, filtering out real, trace amounts of precipitation. By transitioning to GRIB2, we can source data directly from NOAA, bypassing this intermediate step and preserving the full precision of the data. Following a review of these findings with TxDOT, it was determined that a transition to a GRIB2-based pipeline was warranted.
 *   **Recommendation:** The Center for Transportation Research (CTR) recommends that TxDOT transition the MRMS-CRIS data workflow from the current NetCDF implementation, as detailed in the [technical documentation](https://github.com/Adam-Kosicki/mrms-precipitation-analysis/blob/main/TXDOT_Deliverable.md) currently under review, to a new pipeline that sources data directly from NOAA in GRIB2 format.
 *   **Rationale and Benefits:** This recommendation is based on findings that the direct use of GRIB2 data offers several key benefits:
-    *   **Simplified Processing:** The GRIB2 workflow appears to be less computationally intensive.
+    *   **Simplified Processing:** The GRIB2 workflow is less computationally intensive.
     *   **Enhanced Reliability:** By sourcing data directly from NOAA, the workflow reduces dependency on intermediary data feeds, which can contribute to long-term stability.
-    *   **Potential for Increased Accuracy:** GRIB2 data appears to offer higher precision, particularly for trace amounts of rain. This has the potential to improve the quality of derived weather variables.
-    *   **Unified Data Source & Time Savings:** An existing, tested version of the GRIB2 workflow is available and ready for use in the roadway weather analysis (control section project). This presents an opportunity to adapt the core logic for the CRIS data, that would save significant development time.
-    *   **High Performance and Accessibility:** Initial tests show the GRIB2 workflow processing data at speeds comparable to the NetCDF workflow, but on standard hardware. This efficiency could remove the need for specialized computing resources, potentially making the system more accessible and cost-effective to maintain.
+    *   **Increased Accuracy:** GRIB2 data offers higher precision, particularly for trace amounts of rain, improving the quality of derived weather variables.
+    *   **A Mature, High-Performance Workflow Ready for Handoff:** A tested GRIB2 workflow is already in place from a related project and can be quickly adapted, saving significant development time. 
+        *   **High-Throughput on Standard Hardware:** The initial implementation (`preciprate_nearest_neighbor`) processes approximately **10,000 database updates per minute** on a standard developer laptop. A full month of CRIS incident data can be processed in about **2.5 hours**. This performance is comparable to the previous NetCDF workflow, which required a supercomputing cluster.
+        *   **Ongoing Enhancements:** CTR has already completed the initial implementation of a more advanced **bilinear interpolation method** using `wgrib2`, in line with NOAA's best practices. Performance benchmarks are now being finalized to ensure the new method maintains high efficiency while delivering greater accuracy.
 *   **Next Steps:** The CTR team is preparing the necessary deliverables to support this transition. Updated code and revised technical documentation will be delivered to TxDOT by the end of this week to facilitate the internal review cycle.
 
 ### 1.0 Background: The Need for Re-evaluation
@@ -84,3 +85,4 @@ Engineering Scientist Associate
 Center for Transportation Research  
 The University of Texas at Austin  
 Email: adam.kosicki@austin.utexas.edu
+
