@@ -17,7 +17,7 @@
     *   **Superior Data Precision:** GRIB2 provides data with full floating-point precision, eliminating the data loss seen in the current NetCDF workflow and enabling more accurate detection of trace precipitation.
     *   **Direct and Reliable Data Source:** Sourcing data directly from NOAA enhances reliability and provides a clear, authoritative data lineage.
     *   **A Mature, High-Performance Workflow Ready for Handoff:** A tested GRIB2 workflow is already implemented and has been shown to process a full month of CRIS data in just 2.5 hours on a standard laptop. This high-performance codebase is ready for use and handoff to TxDOT.
-*   **Secondary Effort: Enhancement to Bilinear Interpolation.** A secondary effort, which is an outgrowth of the GRIB2 transition, is the ongoing development of a more advanced **bilinear interpolation method**. This aligns our methodology with NOAA's documented best practices. While this enhancement promises even greater accuracy, it is a separate line of development that will be the subject of a future, more detailed discussion. The main priority addressed in this document is the core transition to the GRIB2 data source itself.
+*   **Future Enhancement: Bilinear Interpolation.** The transition to GRIB2 opens the door for future methodological improvements, such as adopting **bilinear interpolation**. This method is recommended by NOAA for greater accuracy and aligns with their best practices. While this enhancement is a logical next step, it is a separate line of development from the core recommendation in this document. The main priority is the transition to the GRIB2 data source itself; the potential for future enhancements like bilinear interpolation is a key benefit of making this move.
 *   **Next Steps:** The CTR team is preparing the necessary deliverables to support this transition. Updated code and revised technical documentation will be delivered to TxDOT by the end of this week to facilitate the internal review cycle.
 
 ### 1.0 Background: The Need for Re-evaluation
@@ -46,15 +46,13 @@ CTR's analysis indicates that the NetCDF data is a derivative product, with the 
 
 This direct data lineage means that by transitioning to a GRIB2 workflow, TxDOT has the opportunity to align its process with the original, unmodified, and higher-precision data available, following best practices suggested by the source provider.
 
-### 4.0 Alignment with NOAA's Recommended Methodology
+### 4.0 Future Opportunity: Alignment with NOAA's Recommended Methodology
 
-The transition to GRIB2 allows for the adoption of data processing techniques that align with NOAA's documented best practices. For estimating values from continuous grid data like precipitation fields, NOAA recommends **4-point bilinear interpolation**.
+The transition to GRIB2 creates an opportunity to adopt data processing techniques that align with NOAA's documented best practices. For estimating values from continuous grid data like precipitation fields, NOAA recommends **4-point bilinear interpolation**. This method can provide a more nuanced estimation of precipitation at a specific point (like a crash location) by calculating a weighted average of the values from the four surrounding grid points, better representing the continuous nature of rainfall.
 
-The previous NetCDF workflow used a nearest-neighbor approach. While effective, it differs from the bilinear interpolation method recommended by NOAA for continuous data fields. To enhance the methodology, CTR is exploring a transition to NOAA's preferred approach.
+The current GRIB2 workflow uses a nearest-neighbor approach, which is fast and effective. However, a key advantage of moving to the GRIB2 ecosystem is that it opens a clear path toward future enhancements. Adopting bilinear interpolation, as recommended by NOAA, is a logical next step that could further improve precision.
 
-Bilinear interpolation can provide a more nuanced estimation of precipitation at a specific point (like a crash location) by calculating a weighted average of the values from the four surrounding grid points. This method better represents the continuous nature of rainfall, which can improve the precision of the data provided to TxDOT.
-
-In line with NOAA's guidance, CTR has developed and is currently testing a bilinear interpolation method. The current implementation with `pygrib2` is a positive step forward from the nearest-neighbor approach. We see a clear path for further optimization, and we anticipate that adopting NOAA's own `wgrib2` utility could yield substantial performance gains.
+CTR recommends that after the initial transition to GRIB2 is complete, a follow-on effort should explore implementing bilinear interpolation. This could involve using NOAA's own `wgrib2` utility, which is the industry standard for GRIB2 data processing and would likely offer both high performance and accuracy.
 
 This highlights a key benefit of the GRIB2 ecosystem: it offers a clear, industry-standard roadmap for best practices. Following this path supports a methodologically sound and continuously improvable system. Such straightforward guidance is less apparent for derivative NetCDF files, which might require more complex, custom solutions to achieve similar data quality.
 
@@ -71,7 +69,7 @@ This accessibility could reduce operational costs and complexity, empowering the
 ### 6.0 Next Steps
 *   **Deliverables:** The updated code and final documentation will be delivered by E.O.D. this Friday to support TxDOT's internal review.
 *   **Code Access and Status:** The initial GRIB2 workflow implementation, which uses the nearest-neighbor method, is available in the private GitHub repository: [https://github.com/Adam-Kosicki/mrms_cris_records_mapping_TxDOT/tree/tacc_lonestar6](https://github.com/Adam-Kosicki/mrms_cris_records_mapping_TxDOT/tree/tacc_lonestar6). This includes all necessary scripts for data ingestion, processing, and analysis (`main.py`, `main_processing.py`, `data_analysis.py`, etc.). TxDOT staff should forward their GitHub usernames to Adam Kosicki to receive collaborator invitations.
-*   **Ongoing Development:** CTR has completed the initial implementation of the bilinear interpolation method and is currently finalizing performance benchmarks. While this method is more computationally intensive, our focus is on optimizing the `wgrib2`-based implementation to deliver a solution that offers higher precision without significantly compromising the established processing efficiency. Updated performance metrics for this enhanced workflow will be shared upon completion of testing.
+*   **Future Recommendations:** As discussed in Section 4.0, CTR recommends a future effort to implement bilinear interpolation to further enhance data precision. This would align the methodology with NOAA's best practices. CTR can provide further guidance on this effort, including how to leverage tools like `wgrib2` for an efficient and accurate implementation. This enhancement can be pursued after TxDOT has successfully transitioned to and operationalized the core GRIB2 workflow.
 *   **Clarification:** The CTR team is available to answer any questions.
 
 ### Contact Information
