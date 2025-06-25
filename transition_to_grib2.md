@@ -18,7 +18,7 @@
     *   **Simplified Processing:** The GRIB2 workflow appears to be less computationally intensive.
     *   **Enhanced Reliability:** By sourcing data directly from NOAA, the workflow reduces dependency on intermediary data feeds, which can contribute to long-term stability.
     *   **Potential for Increased Accuracy:** GRIB2 data appears to offer higher precision, particularly for trace amounts of rain. This has the potential to improve the quality of derived weather variables.
-    *   **Unified Data Source & Time Savings:** An existing, tested GRIB2 workflow is already in use for other CTR projects, such as the roadway weather analysis (control section project). This presents an opportunity to adapt the core logic for the CRIS data, potentially saving significant development time.
+    *   **Unified Data Source & Time Savings:** An existing, tested version of the GRIB2 workflow is available and ready for use in the roadway weather analysis (control section project). This presents an opportunity to adapt the core logic for the CRIS data, that would save significant development time.
     *   **High Performance and Accessibility:** Initial tests show the GRIB2 workflow processing data at speeds comparable to the NetCDF workflow, but on standard hardware. This efficiency could remove the need for specialized computing resources, potentially making the system more accessible and cost-effective to maintain.
 *   **Next Steps:** The CTR team is preparing the necessary deliverables to support this transition. Updated code and revised technical documentation will be delivered to TxDOT by the end of this week to facilitate the internal review cycle.
 
